@@ -43,9 +43,16 @@ model AvailableTriggers {
 }
 
 model Actions {
-  id            String    @id @default(uuid())
-  name          String
-  description   String?
-  zapId         String?
-  zap           Zap?       @relation(fields: [zapId], references: [id])
+  id                 String            @id @default(uuid())
+  zapId              String?
+  zap                Zap?              @relation(fields: [zapId], references: [id])
+  availableActionId  String
+  type               AvailableActions  @relation(fields: [availableActionId], references: [id])
+}
+
+model AvailableActions {
+  id               String     @id @default(uuid())
+  name             String
+  description      String?
+  actions          Actions[]
 }
