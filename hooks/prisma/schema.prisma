@@ -30,6 +30,7 @@ model Zap {
 model Trigger {
   id                 String     @id @default(uuid())
   type               String
+  zap                Zap?
 }
 
 
