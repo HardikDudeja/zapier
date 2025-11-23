@@ -11,49 +11,65 @@ generator client {
 
 datasource db {
   provider = "postgresql"
-  url = env("DATABASE_URL")
+  url      = env("DATABASE_URL")
 }
 
-
 model User {
-  id    Int     @id @default(autoincrement())
-  name  String
-  email String  @unique
+  id       Int    @id @default(autoincrement())
+  name     String
+  email    String @unique
   password String
 }
 
 model Zap {
-  id         String       @id @default(uuid())
-  triggerId  String?      @unique
-  trigger    Trigger?     @relation(fields: [triggerId], references: [id])
-  actions    Actions[]   
+  id        String    @id @default(uuid())
+  triggerId String?   @unique
+  trigger   Trigger?  @relation(fields: [triggerId], references: [id])
+  actions   Actions[]
+  zapRuns   ZapRun[]
 }
 
 model Trigger {
-  id                 String             @id @default(uuid())
-  zap                Zap?              
+  id                 String            @id @default(uuid())
+  zap                Zap?
   availableTriggerId String
-  type               AvailableTriggers  @relation(fields: [availableTriggerId], references: [id])
+  type               AvailableTriggers @relation(fields: [availableTriggerId], references: [id])
 }
 
 model AvailableTriggers {
-  id               String     @id @default(uuid())
-  name             String
-  description      String?
-  trigger          Trigger[]
+  id          String    @id @default(uuid())
+  name        String
+  description String?
+  trigger     Trigger[]
 }
 
 model Actions {
-  id                 String            @id @default(uuid())
-  zapId              String?
-  zap                Zap?              @relation(fields: [zapId], references: [id])
-  availableActionId  String
-  type               AvailableActions  @relation(fields: [availableActionId], references: [id])
+  id                String           @id @default(uuid())
+  zapId             String?
+  zap               Zap?             @relation(fields: [zapId], references: [id])
+  availableActionId String
+  type              AvailableActions @relation(fields: [availableActionId], references: [id])
 }
 
 model AvailableActions {
-  id               String     @id @default(uuid())
-  name             String
-  description      String?
-  actions          Actions[]
+  id          String    @id @default(uuid())
+  name        String
+  description String?
+  actions     Actions[]
+}
+
+model ZapRun {
+  id           String        @id @default(uuid())
+  zapId        String
+  zap          Zap           @relation(fields: [zapId], references: [id])
+  createdAt    DateTime      @default(now())
+  zapRunOutbox ZapRunOutbox?
+  metadata     Json
+}
+
+model ZapRunOutbox {
+  id        String   @id @default(uuid())
+  zapRunId  String   @unique
+  zapRun    ZapRun?  @relation(fields: [zapRunId], references: [id])
+  createdAt DateTime @default(now())
 }
