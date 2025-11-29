@@ -1,8 +1,6 @@
 import "dotenv/config";
 import express from "express";
-import { PrismaClient } from "./generated/prisma/client";
-
-const client = new PrismaClient();
+import { client } from "@repo/db";
 const app = express();
 app.use(express.json());
 
@@ -11,8 +9,6 @@ app.post("/hooks/catch/:userId/:zapId", async (req, res) => {
   const userId = req.params.userId;
   const zapId = req.params.zapId;
   const body = req.body ?? {};
-
-  console.log("printing body", zapId, body)
 
   // store the trigger in the database
   await client.$transaction(async (tx: any) => {
